@@ -1,40 +1,33 @@
 import { useState } from "react";
 
 export default function UploadBox({ setResult }) {
-
-  const [file, setFile] = useState(null);
+  const [files, setFiles] = useState([]); // array to store files
   const [uploading, setUploading] = useState(false);
 
   const handleUpload = async () => {
-    if (!file) {
-      alert("Please select a file");
+    if (!files || files.length === 0) {
+      alert("Please select a file or folder");
       return;
     }
 
     setUploading(true);
 
     const formData = new FormData();
-    formData.append("file", file);
+    files.forEach((file) => {
+      formData.append("files", file); 
+    });
 
     try {
       const response = await fetch("http://127.0.0.1:8000/compress", {
         method: "POST",
-        body: formData
+        body: formData,
       });
 
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-
-      const result = {
-        name: file.name,
-        original_size: file.size,
-        compressed_size: blob.size,
-        url: url,
-      };
-
-      setResult(result);
+      const data = await response.json();
+      setResult(data); 
     } catch (error) {
       console.error("Upload error:", error);
+      alert("Upload failed. Please try again.");
     } finally {
       setUploading(false);
     }
@@ -42,14 +35,26 @@ export default function UploadBox({ setResult }) {
 
   return (
     <div className="p-6 border rounded-xl flex flex-col gap-4 w-96 shadow-lg bg-white">
-
-      {/* Custom File Input */}
-      <label className="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded text-center">
-        {file ? file.name : "Choose File"}
+      {/* Single File Selection */}
+      <label className="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded text-center transition-colors">
+        Select Single File
         <input
           type="file"
           className="hidden"
-          onChange={(e) => setFile(e.target.files[0])}
+          onChange={(e) => setFiles(Array.from(e.target.files))}
+        />
+      </label>
+
+      {/* Folder Selection */}
+      <label className="cursor-pointer bg-purple-500 hover:bg-purple-600 text-white px-6 py-2 rounded text-center transition-colors">
+        Select Folder
+        <input
+          type="file"
+          className="hidden"
+          multiple
+          webkitdirectory="true"
+          directory="true"
+          onChange={(e) => setFiles(Array.from(e.target.files))}
         />
       </label>
 
@@ -63,8 +68,18 @@ export default function UploadBox({ setResult }) {
             : "bg-green-500 hover:bg-green-600"
         }`}
       >
-        {uploading ? "Compressing..." : "Compress File"}
+        {uploading ? "Compressing..." : "Compress File / Folder"}
       </button>
+
+      {/* Show selected files */}
+      {files.length > 0 && (
+        <p className="text-sm text-gray-600 mt-2 break-all">
+          Selected: {files.map((f) => f.name).join(", ")}
+        </p>
+      )}
+    </div>
+  );
+}
 
     </div>
   );
