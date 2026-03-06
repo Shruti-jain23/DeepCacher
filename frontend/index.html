@@ -4,10 +4,19 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
+    <title>DeepCacher</title> <!-- Updated title -->
   </head>
-  <body>
-    <div id="root"></div>
+  <body class="bg-gray-50 flex flex-col items-center min-h-screen">
+
+    <!-- Header -->
+    <header class="w-full bg-blue-600 text-white py-6 shadow-md mb-8">
+      <h1 class="text-center text-3xl font-bold">DeepCacher</h1>
+      <p class="text-center mt-2 text-white/90 text-sm">AI-powered File Compression</p>
+    </header>
+
+    <!-- React Root -->
+    <div id="root" class="w-full flex justify-center"></div>
+
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
